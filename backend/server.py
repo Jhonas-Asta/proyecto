@@ -43,7 +43,7 @@ class User(BaseModel):
     email: EmailStr
     name: str
     role: Literal["student", "teacher"]
-    password_hash: str = Field(exclude=True)
+    password_hash: Optional[str] = Field(default=None, exclude=True)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserRegister(BaseModel):
