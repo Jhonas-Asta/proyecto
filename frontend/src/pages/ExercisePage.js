@@ -40,6 +40,7 @@ const ExercisePage = () => {
       pronunciation: 'Pronunciation Accuracy',
       tryAgain: 'Try Again',
       noSupport: 'Speech recognition is not supported in your browser',
+      micPermission: 'Important: Allow microphone access when your browser asks for permission.',
     },
     es: {
       back: 'Volver al Panel',
@@ -59,6 +60,7 @@ const ExercisePage = () => {
       pronunciation: 'Precisión de Pronunciación',
       tryAgain: 'Intentar de Nuevo',
       noSupport: 'El reconocimiento de voz no es compatible con tu navegador',
+      micPermission: 'Importante: Permite el acceso al micrófono cuando tu navegador lo solicite.',
     },
   };
 
