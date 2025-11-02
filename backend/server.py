@@ -164,14 +164,17 @@ async def register(user_data: UserRegister):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # Create user
+    hashed_pw = hash_password(user_data.password)
     user = User(
         email=user_data.email,
         name=user_data.name,
         role=user_data.role,
-        password_hash=hash_password(user_data.password)
+        password_hash=hashed_pw
     )
     
+    # Convert to dict and manually include password_hash since it's excluded from model_dump
     doc = user.model_dump()
+    doc['password_hash'] = hashed_pw
     doc['created_at'] = doc['created_at'].isoformat()
     await db.users.insert_one(doc)
     
