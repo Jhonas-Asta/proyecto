@@ -98,6 +98,7 @@ const ExercisePage = () => {
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
@@ -109,7 +110,28 @@ const ExercisePage = () => {
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
       setIsRecording(false);
-      toast.error('Speech recognition error. Please try again.');
+      
+      // Handle specific error types
+      if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+        toast.error(language === 'en' 
+          ? 'Microphone permission denied. Please allow microphone access.' 
+          : 'Permiso de micrófono denegado. Por favor, permite el acceso al micrófono.');
+      } else if (event.error === 'no-speech') {
+        toast.warning(language === 'en' 
+          ? 'No speech detected. Please try speaking again.' 
+          : 'No se detectó habla. Por favor, intenta hablar de nuevo.');
+      } else if (event.error === 'network') {
+        toast.error(language === 'en' 
+          ? 'Network error. Please check your connection.' 
+          : 'Error de red. Por favor, verifica tu conexión.');
+      } else if (event.error === 'aborted') {
+        // Don't show error for aborted (user stopped manually)
+        return;
+      } else {
+        toast.error(language === 'en' 
+          ? 'Speech recognition error. Please try again.' 
+          : 'Error de reconocimiento de voz. Por favor, intenta de nuevo.');
+      }
     };
 
     recognition.onend = () => {
