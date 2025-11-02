@@ -209,10 +209,31 @@ const ExercisePage = () => {
       return;
     }
 
-    setIsRecording(true);
+    // Reset state
     setRecognizedText('');
     setFeedback(null);
-    recognitionRef.current.start();
+    setScore(null);
+    setPronunciationAccuracy(null);
+    
+    try {
+      setIsRecording(true);
+      recognitionRef.current.start();
+    } catch (error) {
+      console.error('Error starting recognition:', error);
+      setIsRecording(false);
+      
+      // Handle "already started" error
+      if (error.message && error.message.includes('already started')) {
+        toast.warning(language === 'en' 
+          ? 'Recording already in progress' 
+          : 'Grabación ya en progreso');
+      } else {
+        toast.error(language === 'en' 
+          ? 'Failed to start recording. Please try again.' 
+          : 'No se pudo iniciar la grabación. Por favor, intenta de nuevo.');
+      }
+    }
+  };
   };
 
   const handleStopRecording = () => {
