@@ -234,11 +234,15 @@ const ExercisePage = () => {
       }
     }
   };
-  };
 
   const handleStopRecording = () => {
     if (recognitionRef.current && isRecording) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch (error) {
+        console.error('Error stopping recognition:', error);
+        setIsRecording(false);
+      }
     }
   };
 
