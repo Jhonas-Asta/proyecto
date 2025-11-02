@@ -40,6 +40,7 @@ const ExercisePage = () => {
       pronunciation: 'Pronunciation Accuracy',
       tryAgain: 'Try Again',
       noSupport: 'Speech recognition is not supported in your browser',
+      micPermission: 'Important: Allow microphone access when your browser asks for permission.',
     },
     es: {
       back: 'Volver al Panel',
@@ -59,6 +60,7 @@ const ExercisePage = () => {
       pronunciation: 'Precisión de Pronunciación',
       tryAgain: 'Intentar de Nuevo',
       noSupport: 'El reconocimiento de voz no es compatible con tu navegador',
+      micPermission: 'Importante: Permite el acceso al micrófono cuando tu navegador lo solicite.',
     },
   };
 
@@ -98,6 +100,7 @@ const ExercisePage = () => {
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
@@ -109,7 +112,28 @@ const ExercisePage = () => {
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
       setIsRecording(false);
-      toast.error('Speech recognition error. Please try again.');
+      
+      // Handle specific error types
+      if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+        toast.error(language === 'en' 
+          ? 'Microphone permission denied. Please allow microphone access.' 
+          : 'Permiso de micrófono denegado. Por favor, permite el acceso al micrófono.');
+      } else if (event.error === 'no-speech') {
+        toast.warning(language === 'en' 
+          ? 'No speech detected. Please try speaking again.' 
+          : 'No se detectó habla. Por favor, intenta hablar de nuevo.');
+      } else if (event.error === 'network') {
+        toast.error(language === 'en' 
+          ? 'Network error. Please check your connection.' 
+          : 'Error de red. Por favor, verifica tu conexión.');
+      } else if (event.error === 'aborted') {
+        // Don't show error for aborted (user stopped manually)
+        return;
+      } else {
+        toast.error(language === 'en' 
+          ? 'Speech recognition error. Please try again.' 
+          : 'Error de reconocimiento de voz. Por favor, intenta de nuevo.');
+      }
     };
 
     recognition.onend = () => {
@@ -187,15 +211,40 @@ const ExercisePage = () => {
       return;
     }
 
-    setIsRecording(true);
+    // Reset state
     setRecognizedText('');
     setFeedback(null);
-    recognitionRef.current.start();
+    setScore(null);
+    setPronunciationAccuracy(null);
+    
+    try {
+      setIsRecording(true);
+      recognitionRef.current.start();
+    } catch (error) {
+      console.error('Error starting recognition:', error);
+      setIsRecording(false);
+      
+      // Handle "already started" error
+      if (error.message && error.message.includes('already started')) {
+        toast.warning(language === 'en' 
+          ? 'Recording already in progress' 
+          : 'Grabación ya en progreso');
+      } else {
+        toast.error(language === 'en' 
+          ? 'Failed to start recording. Please try again.' 
+          : 'No se pudo iniciar la grabación. Por favor, intenta de nuevo.');
+      }
+    }
   };
 
   const handleStopRecording = () => {
     if (recognitionRef.current && isRecording) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch (error) {
+        console.error('Error stopping recognition:', error);
+        setIsRecording(false);
+      }
     }
   };
 
