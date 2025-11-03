@@ -1,4 +1,4 @@
-#!/home/jhonatan/carpeta/proyecto/backend/env/bin/python3
+#!/home/linux-casa/Documentos/proyecto/backend/env/bin/python3
 
 import sys
 import json
