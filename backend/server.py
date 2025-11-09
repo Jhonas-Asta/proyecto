@@ -18,10 +18,12 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-# mongo_url = os.environ['MONGO_URL']
+# a la hora de crear en mongodb por defecto crear mi_base_de_datos
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+print(f"✅ Conectado a la base de datos: {os.environ['DB_NAME']} en {mongo_url}")
+
 
 # JWT Configuration
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
@@ -159,6 +161,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 @api_router.post("/auth/register", response_model=TokenResponse)
 async def register(user_data: UserRegister):
+
+    # se añadira prints o logs que verifiquen que recibe fastApi
+    print("===== /auth/register called =====")
+    print("Datos recibidos:", user_data)
+
     # Check if user exists
     existing = await db.users.find_one({"email": user_data.email})
     if existing:

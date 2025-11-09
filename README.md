@@ -7,7 +7,8 @@ Este es un proyecto fullstack que consiste en un backend en Python (FastAPI) y u
 - Python 3.8 o superior
 - Node.js 16.x o superior
 - Yarn 1.22.x o superior
-- MongoDB (para la base de datos)
+- MongoDB (para la base de datos) - por defecto usar la base de datos con nombre 'mi_base_de_datos'
+
 
 ## Configuración del Backend
 
@@ -28,6 +29,13 @@ source env/bin/activate  # En Linux/Mac
 3. Instala las dependencias:
 ```bash
 pip install -r requirements.txt
+```
+
+extra - Como pase antes de iniciar para que realize la conexion de manera locar
+usar dos comando
+```bash
+export MONGO_URL="mongodb://localhost:27017"
+export DB_NAME="mi_base_de_datos"
 ```
 
 4. Inicia el servidor:
